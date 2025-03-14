@@ -39,7 +39,8 @@ class TaskController extends Controller
             'description' => 'required|string',
             'status' => 'required|string',
             'project' => 'nullable|exists:projects,id',
-            'hours' => 'nullable|numeric', // Ensure project ID exists in the projects table
+            'hours' => 'nullable|numeric',
+             // Ensure project ID exists in the projects table
         ]);
 
 
@@ -50,7 +51,9 @@ class TaskController extends Controller
         $task->status = $validatedData['status'];
         $task->project_id = $validatedData['project'];
         $task->worker_id = Auth::id();
-        $task->hours = $validatedData['hours'];// Assign project ID here
+        $task->hours = $validatedData['hours'];
+        $task->system_date = now();
+        // Assign project ID here
         $task->save();
     
         return redirect()->route('tasks.index')->with('success', 'Task added successfully.');
@@ -60,17 +63,26 @@ class TaskController extends Controller
     public function update(Request $request, Task $task)
     {
         $validatedData = $request->validate([
-            'title' => 'required|string',
+            'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'status' => 'required|string',
-            'project' => 'nullable|string', // Validate project_id
+            'status' => 'required|in:pending,completed',
+            'project' => 'nullable|exists:projects,id',
+            'hours' => 'nullable|numeric',
         ]);
     
-        $task->update($validatedData);
+        // Update task with validated data
+        $task->update([
+            'title' => $validatedData['title'],
+            'description' => $validatedData['description'],
+            'status' => $validatedData['status'],
+            'project_id' => $validatedData['project'],
+            'hours' => $validatedData['hours'],
+        ]);
     
-        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
+        return redirect()->route('tasks.index')->with('success', 'Task added successfully.');
     }
     
+
     
 
 

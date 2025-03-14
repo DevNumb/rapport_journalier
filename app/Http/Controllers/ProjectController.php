@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Carbon\Carbon;
+use Illuminate\Support\Arr;  // Correct import statement
 
 class ProjectController extends Controller
 {
@@ -15,7 +18,27 @@ class ProjectController extends Controller
      * @return \Illuminate\View\View
      */
     public function index(Request $request)
-    {
+    { 
+        $tasksByMonth = Arr::get(Task::selectRaw('MONTH(system_date) as month, COUNT(*) as count')
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get()
+        ->pluck('count', 'month')
+        ->toArray(), null, []); // Provide an empty array as the default
+
+    $tasksByDay = Arr::get(Task::selectRaw('DAY(system_date) as day, COUNT(*) as count')
+        ->groupBy('day')
+        ->orderBy('day')
+        ->get()
+        ->pluck('count', 'day')
+        ->toArray(), null, []); // Provide an empty array as the default
+
+    $tasksByYear = Arr::get(Task::selectRaw('YEAR(system_date) as year, COUNT(*) as count')
+        ->groupBy('year')
+        ->orderBy('year')
+        ->get()
+        ->pluck('count', 'year')
+        ->toArray(), null, []); // Provide an empty array as the default
         $search = $request->input('search');
         $projects = Project::when($search, function ($query, $search) {
             return $query->where('ref', 'like', '%' . $search . '%')
@@ -23,7 +46,7 @@ class ProjectController extends Controller
                 ->orWhere('description', 'like', '%' . $search . '%');
         })->get();
 
-        return view('projects.index', compact('projects'));
+        return view('projects.index', compact('projects', 'tasksByMonth', 'tasksByDay', 'tasksByYear'));
     }
 
     /**

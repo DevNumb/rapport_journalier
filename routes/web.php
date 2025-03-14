@@ -22,8 +22,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Other routes...
-Route::put('/tasks/{task}', 'TaskController@update')->name('tasks.update');
+
 
 
 Route::post('/login', [LoginController::class, 'authenticate'])->name('login.submit');
@@ -45,7 +44,7 @@ Route::get('/calendar', [EventController::class, 'index'])->name('calendar.index
 Route::post('/events', [EventController::class, 'store'])->name('events.store');
 Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
 Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
-Route::resource('events', EventController::class);
+Route::resource('events', EventController::class)->middleware('auth');
 
 Route::resource('workers', WorkerController::class)->middleware('auth');
 Route::resource('activities', ActivityController::class)->middleware('auth');
@@ -66,5 +65,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
+
+// routes/web.php
+
+
+
 
 require __DIR__.'/auth.php';

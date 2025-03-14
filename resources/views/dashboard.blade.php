@@ -9,6 +9,9 @@
     <title>Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
     <style>
 
     </style>
@@ -58,7 +61,6 @@
                 </li>
             </ul>
 
-            <!-- User Dropdown -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
@@ -100,7 +102,10 @@
     <div class="container-fluid">
         <!-- Page Heading -->
         <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
-
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
+    Add New User
+</button>
+<br> <br>
         <!-- Workers Table -->
         <div class="table-responsive">
             <!-- Add Worker Modal -->
@@ -259,9 +264,8 @@
         </div>
     </div>
 </div>
-<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
-    <i class="bi bi-plus"></i> Add New Worker
-</button>
+
+
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
