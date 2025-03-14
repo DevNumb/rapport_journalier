@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 13, 2025 at 01:21 PM
+-- Generation Time: Mar 14, 2025 at 12:34 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.1.12
 
@@ -135,7 +135,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (8, '2025_03_11_073159_create_reports_table', 4),
 (9, '2025_03_12_124622_add_project_id_to_tasks_table', 5),
 (10, '2025_03_13_081545_add_user', 6),
-(11, '2025_03_13_112222_add_hours_to_tasks_table', 7);
+(11, '2025_03_13_112222_add_hours_to_tasks_table', 7),
+(12, '2025_03_13_133807_add_duration_columns_to_tasks_table', 8);
 
 -- --------------------------------------------------------
 
@@ -217,15 +218,17 @@ CREATE TABLE `tasks` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `project_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `worker_id` bigint(20) UNSIGNED DEFAULT NULL
+  `worker_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `system_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `tasks`
 --
 
-INSERT INTO `tasks` (`id`, `title`, `description`, `status`, `hours`, `created_at`, `updated_at`, `project_id`, `worker_id`) VALUES
-(15, 'hh', 'vvvvv', 'pending', 3.00, '2025-03-13 10:42:31', '2025-03-13 10:42:31', 1, 4);
+INSERT INTO `tasks` (`id`, `title`, `description`, `status`, `hours`, `created_at`, `updated_at`, `project_id`, `worker_id`, `system_date`) VALUES
+(15, 'hh', 'v', 'completed', 3.00, '2025-03-13 10:42:31', '2025-03-14 08:56:40', 1, 4, '2025-03-14 09:56:40'),
+(16, 'qdqdq', 'xqx', 'completed', 2.00, '2025-03-14 07:02:42', '2025-03-14 07:02:42', 1, 4, '2025-03-14 07:02:42');
 
 -- --------------------------------------------------------
 
@@ -355,7 +358,7 @@ ALTER TABLE `journaliers`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -379,7 +382,7 @@ ALTER TABLE `reports`
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `workers`
