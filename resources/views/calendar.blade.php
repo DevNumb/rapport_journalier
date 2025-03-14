@@ -1,9 +1,16 @@
+@extends('layouts.app')
 
+@section('content')
 
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -28,82 +35,7 @@
     </style>
 </head>
 <body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container-fluid">
-        <!-- Brand/Logo -->
-        <a class="navbar-brand" href="{{ route('dashboard') }}">
-            <img src="{{ asset('path/to/your/logo.png') }}" alt="Logo" width="30" height="30"
-                 class="d-inline-block align-text-top">
-            rapport_journail
-        </a>
 
-        <!-- Toggle Button for Mobile -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- Navbar Links -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
-                       href="{{ route('dashboard') }}">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('workers.index') ? 'active' : '' }}"
-                       href="{{ route('workers.index') }}">Manage Workers</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('tasks.index') ? 'active' : '' }}"
-                       href="{{ route('tasks.index') }}">Manage Tasks</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Settings</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('calendar.index') }}">Calendar</a>
-                </li>
-
-            </ul>
-
-            <!-- User Dropdown -->
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
-                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="me-2">{{ auth()->user()->name }}</span>
-                        <i class="fas fa-user-circle fa-lg"></i> <!-- Font Awesome user icon -->
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user me-2"></i> Profile
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-cog me-2"></i> Settings
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li>
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="dropdown-item">
-                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
 
     <div id="calendar"></div>
 
@@ -188,10 +120,11 @@
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'timeGridWeek,timeGridDay'
-                },
+    left: 'prevYear,prev,next,nextYear today',
+    center: 'title',
+    right: 'timeGridWeek,timeGridDay'
+},
+
                 initialView: 'timeGridWeek',  // Show in week time grid
                 slotMinTime: '08:00:00',
                 slotMaxTime: '20:00:00',
@@ -306,4 +239,6 @@
     </script>
 </body>
 </html>
+@endsection
+
 
