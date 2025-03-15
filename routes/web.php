@@ -59,6 +59,9 @@ Route::get('/exportTask', [TaskController::class, 'export'])->name('tasks.export
 Route::get('/exportReport', [ReportController::class, 'export'])->name('reports.export')->middleware('auth');
 Route::get('/exportProject', [ProjectController::class, 'export'])->name('projects.export')->middleware('auth');
 Route::get('/exportJournalier', [JournalierController::class, 'export'])->name('journaliers.export')->middleware('auth');
+Route::get('/projects/{id}/statistics', [ProjectController::class, 'getStatistics'])->name('projects.statistics');
+
+
 
 // Profile Routes
 Route::middleware('auth')->group(function () {

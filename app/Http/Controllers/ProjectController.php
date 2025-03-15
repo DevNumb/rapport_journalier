@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Carbon\Carbon;
-use Illuminate\Support\Arr;  // Correct import statement
+use Illuminate\Support\Arr; 
+use Illuminate\Support\Facades\DB; // Correct import statement
 
 class ProjectController extends Controller
 {
@@ -163,6 +164,54 @@ class ProjectController extends Controller
     // Return the file as a download
     return response()->download($filename, $filename)->deleteFileAfterSend();
 }
+
+
+
+
+public function getStatistics(Request $request, $id)
+{
+    $filter = $request->input('filter', 'month');
+
+    $filterMap = [
+        'month' => 'MONTH(system_date)',
+        'year' => 'YEAR(system_date)',
+        'day' => 'DAY(system_date)'
+    ];
+
+    if (!isset($filterMap[$filter])) {
+        $filter = 'month';
+    }
+
+    try {
+        $query = Task::where('project_id', $id)
+            ->selectRaw("{$filterMap[$filter]} as period, SUM(hours) as total_hours")  // Corrected Syntax
+            ->groupBy('period')
+            ->orderBy('period');
+
+        $stats = $query->get();
+
+        // Debugging: Log the raw SQL and bindings
+        \Log::info('SQL Query:', ['query' => $query->toSql(), 'bindings' => $query->getBindings()]);
+
+        $labels = $stats->pluck('period')->toArray();
+        $data = $stats->pluck('total_hours')->toArray();
+
+        // Debugging: Log the labels and data
+        \Log::info('Labels:', $labels);
+        \Log::info('Data:', $data);
+
+        return response()->json([
+            'labels' => $labels,
+            'data' => $data,
+        ]);
+    } catch (\Exception $e) {
+        \Log::error($e->getMessage());
+        return response()->json(['error' => 'Failed to load statistics', 'message' => $e->getMessage()], 500);
+    }
+}
+
+
+
 
 
 }
