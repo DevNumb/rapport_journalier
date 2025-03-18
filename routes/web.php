@@ -80,7 +80,8 @@ Route::get('/projects/{project}/statistics', [ProjectController::class, 'getStat
 Route::get('/projects/{project}/user-statistics', [ProjectController::class, 'getUserStatistics'])->name('projects.userStatistics');
 // routes/web.php
 
-Route::get('/worker/stats/{worker_id}', [WorkerController::class, 'getWorkerStats']);
+Route::get('/worker/stats/{worker_id}/{statsType?}', [WorkerController::class, 'getWorkerStats'])->name('worker.stats');
+
 
 
 

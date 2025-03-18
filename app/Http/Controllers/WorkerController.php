@@ -137,26 +137,67 @@ class WorkerController extends Controller
     return response()->json($tasksWithProjectNames);
 }
 
-public function getWorkerStats($worker_id)
+public function getWorkerStats($worker_id, $statsType = 'month')
 {
     $tasks = Task::where('worker_id', $worker_id)->with('project')->get();
 
-    $stats = $tasks->map(function ($task) {
-        return [
-            'project_name' => $task->project ? $task->project->nom_projet : 'No Project',
-            'hours_worked' => $task->hours,
-        ];
-    });
+    $groupedStats = [];
 
-    $groupedStats = $stats->groupBy('project_name')->map(function ($group) {
-        return [
-            'project_name' => $group->first()['project_name'],
-            'total_hours' => $group->sum('hours_worked'),
-        ];
-    });
+    switch ($statsType) {
+        case 'month':
+            $groupedStats = $tasks->groupBy(function ($task) {
+                return $task->system_date->format('Y-m');
+            })->map(function ($group) {
+                return [
+                    'period' => $group->first()->system_date->format('Y-m'),
+                    'total_hours' => $group->sum('hours'),
+                    'project_names' => $group->map(function ($task) {
+                        return $task->project ? $task->project->nom_projet : 'No Project';
+                    })->unique()->values()->all(), // Get unique project names
+                ];
+            })->values()->toArray();
+            break;
+        case 'year':
+            $groupedStats = $tasks->groupBy(function ($task) {
+                return $task->system_date->format('Y');
+            })->map(function ($group) {
+                return [
+                    'period' => $group->first()->system_date->format('Y'),
+                    'total_hours' => $group->sum('hours'),
+                    'project_names' => $group->map(function ($task) {
+                        return $task->project ? $task->project->nom_projet : 'No Project';
+                    })->unique()->values()->all(), // Get unique project names
+                ];
+            })->values()->toArray();
+            break;
+        case 'day':
+            $groupedStats = $tasks->groupBy(function ($task) {
+                return $task->system_date->format('Y-m-d');
+            })->map(function ($group) {
+                return [
+                    'period' => $group->first()->system_date->format('Y-m-d'),
+                    'total_hours' => $group->sum('hours'),
+                    'project_names' => $group->map(function ($task) {
+                        return $task->project ? $task->project->nom_projet : 'No Project';
+                    })->unique()->values()->all(), // Get unique project names
+                ];
+            })->values()->toArray();
+            break;
+        default:
+            return response()->json(['error' => 'Invalid statsType'], 400);
+    }
 
-    return response()->json($groupedStats->values()->all()); // Ensure it's an array
+    if (empty($groupedStats)) {
+        \Log::info("No data found for worker_id: $worker_id, statsType: $statsType");
+    }
+
+    return response()->json($groupedStats);
 }
+
+
+
+
+
 
 
 

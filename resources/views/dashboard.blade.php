@@ -294,6 +294,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Your custom script should come AFTER Chart.js -->
+
 
 <div class="modal fade" id="workerStatsModal" tabindex="-1" aria-labelledby="workerStatsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -303,12 +306,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="statsContent"></div>
-                <canvas id="statsChart"></canvas>
-            </div>
+    <select id="statsTypeSelect" class="form-select">
+        <option value="month">Month</option>
+        <option value="year">Year</option>
+        <option value="day">Day</option>
+    </select>
+    <div id="statsContent"></div>
+    <canvas id="statsChart"></canvas>
+</div>
         </div>
     </div>
 </div>
+
 
 
 
@@ -318,36 +327,75 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+let myChart;
+
 $(document).ready(function() {
     $(document).on('click', '.openStatsModal', function() {
         var workerId = $(this).data('worker-id');
+        $('#workerStatsModal').data('worker-id', workerId); // Set data on the modal
+        loadStats(workerId, 'month'); // Load default month stats
+    });
+
+    $('#statsTypeSelect').on('change', function() {
+        var workerId = $('#workerStatsModal').data('worker-id'); // Get workerId from modal
+        var statsType = $(this).val();
+        loadStats(workerId, statsType);
+    });
+
+    function loadStats(workerId, statsType) {
         $.ajax({
-    type: 'GET',
-    url: '/worker/stats/' + workerId,
-    success: function(data) {
-        var tableHtml = '<table class="table table-bordered">';
-        tableHtml += '<thead><tr><th>Project Name</th><th>Total Hours Worked</th></tr></thead>';
-        tableHtml += '<tbody>';
+            type: 'GET',
+            url: '/worker/stats/' + workerId + '/' + statsType,
+            success: function(data) {
+                //Clear error content before populating data
+                 $('#statsContent').empty();
 
-        var projectNames = [];
-        var hoursWorked = [];
+                if (myChart) {
+                    myChart.destroy();
+                }
 
-        data.forEach(function(stat) {
-            tableHtml += '<tr><td>' + stat.project_name + '</td><td>' + stat.total_hours + '</td></tr>';
-            projectNames.push(stat.project_name);
-            hoursWorked.push(stat.total_hours);
+                var tableHtml = '<table class="table table-bordered">';
+                tableHtml += '<thead><tr><th>Project Names</th><th>Period</th><th>Total Hours Worked</th></tr></thead>';
+                tableHtml += '<tbody>';
+
+                var chartLabels = [];
+                var chartData = [];
+
+                if (data.length === 0) {
+                    $('#statsContent').html("No projects worked");
+                    return; // No data exist
+                }
+
+                if (Array.isArray(data)) {
+                    data.forEach(function(stat) {
+                        tableHtml += `<tr><td>${stat.project_names.join(', ')}</td><td>${stat.period}</td><td>${stat.total_hours}</td></tr>`;
+                        chartLabels.push(stat.period);
+                        chartData.push(stat.total_hours);
+                    });
+                } else {
+                    $('#statsContent').html("<p>Error: Data is an empty array</p>");
+                    return;
+                }
+
+                tableHtml += '</tbody></table>';
+                $('#statsContent').html(tableHtml);
+                createChart(chartLabels, chartData);
+                $('#workerStatsModal').modal('show');
+
+            },
+            error: function(xhr) {
+                console.error('Error fetching worker stats:', xhr.responseText);
+                $('#statsContent').html("<p>Error loading stats.  Check the console.</p>");
+            }
         });
+    }
 
-        tableHtml += '</tbody></table>';
-
-        $('#statsContent').html(tableHtml);
-
-        // Create a bar chart
+    function createChart(labels, hoursWorked) {
         var ctx = document.getElementById('statsChart').getContext('2d');
-        var chart = new Chart(ctx, {
+        myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: projectNames,
+                labels: labels,
                 datasets: [{
                     label: 'Hours Worked',
                     data: hoursWorked,
@@ -378,23 +426,17 @@ $(document).ready(function() {
                 }
             }
         });
-
-        // Open the modal
-        $('#workerStatsModal').modal('show');
-    },
-    error: function(xhr) {
-        console.error('Error fetching worker stats:', xhr.responseText);
     }
 });
 
 
-    });
-});
 
 
 
-</script>
-                <!-- Scripts -->
+
+
+
+</script>              <!-- Scripts -->
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
