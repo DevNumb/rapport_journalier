@@ -19,12 +19,12 @@ class TaskController extends Controller
             return $query->where('title', 'like', '%' . $search . '%')
                 ->orWhere('description', 'like', '%' . $search . '%');
         })->get();
-    
+
         $projects = Project::all(); // Fetch all projects
-    
+
         return view('task', compact('tasks', 'projects')); // Pass $projects to the view
     }
-    
+
 
 
     public function create()
@@ -55,11 +55,11 @@ class TaskController extends Controller
         $task->system_date = now();
         // Assign project ID here
         $task->save();
-    
+
         return redirect()->route('tasks.index')->with('success', 'Task added successfully.');
     }
-    
-    
+
+
     public function update(Request $request, Task $task)
     {
         $validatedData = $request->validate([
@@ -69,7 +69,7 @@ class TaskController extends Controller
             'project' => 'nullable|exists:projects,id',
             'hours' => 'nullable|numeric',
         ]);
-    
+
         // Update task with validated data
         $task->update([
             'title' => $validatedData['title'],
@@ -78,12 +78,12 @@ class TaskController extends Controller
             'project_id' => $validatedData['project'],
             'hours' => $validatedData['hours'],
         ]);
-    
+
         return redirect()->route('tasks.index')->with('success', 'Task added successfully.');
     }
-    
 
-    
+
+
 
 
     public function edit(Task $task)
@@ -91,7 +91,7 @@ class TaskController extends Controller
         $projects = Project::all();  // Retrieve all projects
         return response()->json(['task' => $task, 'projects' => $projects]);
     }
-    
+
 
 
 
@@ -130,6 +130,13 @@ class TaskController extends Controller
 
         // Return the file as a download
         return response()->download($filename, $filename)->deleteFileAfterSend();
+    }
+
+
+    public function show($id)
+    {
+        $task = Task::with(['worker', 'project'])->findOrFail($id);
+        return view('tasks.show', compact('task'));
     }
 
 }

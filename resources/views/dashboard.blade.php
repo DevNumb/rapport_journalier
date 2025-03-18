@@ -10,9 +10,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
     <style>
+#calendarPopup {
+    width: 100%;
+    max-width: 800px;
+}
+
+#calendar {
+    width: 100%;
+    height: auto;
+}
+
+.fc-event-title {
+    white-space: normal !important; /* Allow text to wrap */
+    word-wrap: break-word; /* Break long words */
+}
+/* Ensure the modal appears on top of the calendar */
+
+/* Ensure the modal appears on top of the calendar */
+#projectDetailsModal {
+    z-index: 9999; /* Higher than FullCalendar's z-index */
+    position: fixed; /* Ensure it stays in place */
+}
+
+/* Optional: Ensure the modal backdrop appears on top */
 
     </style>
 </head>
@@ -198,6 +225,35 @@
     </div>
 </div>
 
+<div class="modal fade" id="projectDetailsModal" tabindex="-1" aria-labelledby="projectDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="projectDetailsModalLabel">Project Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Project Name:</strong> <span id="projectName"></span></p>
+                <p><strong>project Name:</strong> <span id="projectDescription"></span></p>
+                <p><strong>Start Date:</strong> <span id="projectStartDate"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popup container -->
+<div id="calendarPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 9998;">
+    <button id="closePopup" class="btn btn-secondary">Close</button>
+    <div id="calendar" style="margin-top: 20px;"></div>
+</div>
+
+
+<!-- Modal for displaying project details -->
+
+
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -218,7 +274,10 @@
                         <td>{{ $worker->role }}</td>
                         <td>{{ $worker->poste }}</td>
                         <td>
-                            <button type="button" class="btn btn-sm btn-primary editWorkerButton" data-worker-id="{{ $worker->id }}" data-worker-name="{{ $worker->name }}" data-worker-email="{{ $worker->email }}" data-worker-role="{{ $worker->role }}" data-worker-poste="{{ $worker->poste }}">Edit</button>
+                        <button class="btn btn-success"><i class="fas fa-chart-bar"></i></button>
+                        <button class="btn btn-primary openCalendar" data-worker-id="{{ $worker->id }}"><i class="fa fa-calendar"></i></button>
+
+                            <button type="button" class="btn btn-sm btn-success editWorkerButton" data-worker-id="{{ $worker->id }}" data-worker-name="{{ $worker->name }}" data-worker-email="{{ $worker->email }}" data-worker-role="{{ $worker->role }}" data-worker-poste="{{ $worker->poste }}">Edit</button>
                             <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
@@ -253,6 +312,88 @@
             // Show the modal
             $('#editWorkerModal').modal('show');
         });
+
+
+
+});
+
+
+const $calendarPopup = $('#calendarPopup');
+    const $closePopupButton = $('#closePopup');
+    const $calendarEl = $('#calendar')[0]; // Get the DOM element
+    let calendar;
+
+    function initializeCalendar(workerId) {
+    if (calendar) {
+        calendar.destroy();
+    }
+
+    calendar = new FullCalendar.Calendar($calendarEl, {
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth'
+        },
+        initialView: 'dayGridMonth',
+        events: function (info, successCallback, failureCallback) {
+            fetch(`/workers/${workerId}/tasks`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const events = data.map(task => {
+                        return {
+                            title: task.project_name, // Use full project name
+                            start: new Date(task.system_date), // Parse the date string
+                            end: new Date(task.system_date),
+                            extendedProps: {
+                                projectName: task.project_name, // Add project name
+                                description: task.description || 'No description', // Add description
+                                startDate: task.system_date // Add start date
+                            }
+                        };
+                    });
+
+                    successCallback(events);
+                })
+                .catch(error => {
+                    console.error('Error fetching tasks:', error);
+                    failureCallback(error);
+                });
+        },
+        eventClick: function(info) {
+            console.log('Event clicked:', info.event); // Debugging
+            const projectName = info.event.extendedProps.projectName;
+            const description = info.event.extendedProps.description;
+            const startDate = info.event.extendedProps.startDate;
+
+            document.getElementById('projectName').textContent = projectName;
+            document.getElementById('projectDescription').textContent = description;
+            document.getElementById('projectStartDate').textContent = startDate;
+
+            const projectDetailsModal = new bootstrap.Modal(document.getElementById('projectDetailsModal'));
+            projectDetailsModal.show();
+        },
+        height: 'auto',
+    });
+
+    calendar.render();
+}
+    // Open Calendar Popup Handler
+    $(document).on('click', '.openCalendar', function() {
+            const workerId = $(this).data('worker-id');
+            console.log(workerId);
+            initializeCalendar(workerId);
+            $calendarPopup.show();
+        });
+
+
+    // Close Calendar Popup Handler
+    $closePopupButton.on('click', function () {
+        $calendarPopup.css('display', 'none');
     });
 </script>
 

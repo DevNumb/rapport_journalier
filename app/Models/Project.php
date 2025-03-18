@@ -9,7 +9,7 @@ class Project extends Model
     protected $fillable = [
         'ref',
         'nom_projet',
-        'description',
+        'description'
     ];
 
     // In your Project model

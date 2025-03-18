@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use App\Models\Task;
 
 class WorkerController extends Controller
 {
@@ -96,10 +98,43 @@ class WorkerController extends Controller
         return redirect()->route('workers.index')->with('success', 'Worker updated successfully.');
     }
 
-    // Remove the specified worker from the database
-    public function destroy(Worker $worker)
+    public function destroy($id)
     {
+        // Find the worker by ID
+        $worker = Worker::find($id);
+
+        // Check if the worker exists
+        if (!$worker) {
+            return redirect()->route('workers.index')->with('error', 'Worker not found.');
+        }
+
+        // Delete the worker
         $worker->delete();
+
+        // Redirect with a success message
         return redirect()->route('workers.index')->with('success', 'Worker deleted successfully.');
     }
+    public function getTasksByWorker($worker_id)
+{
+    Log::info("Fetching tasks for worker ID: " . $worker_id); // Log worker ID
+
+    $tasks = Task::where('worker_id', $worker_id)->with('project')->get();
+
+    Log::info("Retrieved tasks: ", $tasks->toArray()); // Log the tasks retrieved
+
+    // Debugging: Log each task and its project
+    foreach ($tasks as $task) {
+        Log::info("Task ID: " . $task->id . ", Project: " . ($task->project ? $task->project->nom_projet : 'No Project'));
+    }
+
+    $tasksWithProjectNames = $tasks->map(function ($task) {
+        return [
+            'system_date' => $task->system_date ? $task->system_date->format('Y-m-d') : null,
+            'project_name' => $task->project ? $task->project->nom_projet : 'No Project',
+        ];
+    });
+
+    return response()->json($tasksWithProjectNames);
+}
+
 }

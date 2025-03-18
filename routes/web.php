@@ -71,6 +71,14 @@ Route::middleware('auth')->group(function () {
 
 // routes/web.php
 
+// routes/web.php
+
+Route::get('/workers/{worker_id}/tasks', [WorkerController::class, 'getTasksByWorker']);
+
+
+Route::get('/projects/{project}/statistics', [ProjectController::class, 'getStatistics'])->name('projects.statistics');
+Route::get('/projects/{project}/user-statistics', [ProjectController::class, 'getUserStatistics'])->name('projects.userStatistics');
+
 
 
 
