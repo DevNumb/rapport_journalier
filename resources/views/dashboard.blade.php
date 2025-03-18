@@ -50,8 +50,7 @@
     <div class="container-fluid">
         <!-- Brand/Logo -->
         <a class="navbar-brand" href="{{ route('dashboard') }}">
-            <img src="{{ asset('path/to/your/logo.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
-            Rapport Journal
+            Rapport Journalier
         </a>
 
         <!-- Toggle Button for Mobile -->
