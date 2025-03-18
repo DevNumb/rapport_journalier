@@ -137,4 +137,27 @@ class WorkerController extends Controller
     return response()->json($tasksWithProjectNames);
 }
 
+public function getWorkerStats($worker_id)
+{
+    $tasks = Task::where('worker_id', $worker_id)->with('project')->get();
+
+    $stats = $tasks->map(function ($task) {
+        return [
+            'project_name' => $task->project ? $task->project->nom_projet : 'No Project',
+            'hours_worked' => $task->hours,
+        ];
+    });
+
+    $groupedStats = $stats->groupBy('project_name')->map(function ($group) {
+        return [
+            'project_name' => $group->first()['project_name'],
+            'total_hours' => $group->sum('hours_worked'),
+        ];
+    });
+
+    return response()->json($groupedStats->values()->all()); // Ensure it's an array
+}
+
+
+
 }

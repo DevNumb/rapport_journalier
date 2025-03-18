@@ -274,7 +274,10 @@
                         <td>{{ $worker->role }}</td>
                         <td>{{ $worker->poste }}</td>
                         <td>
-                        <button class="btn btn-success"><i class="fas fa-chart-bar"></i></button>
+                        <button class="btn btn-success openStatsModal" data-worker-id="{{ $worker->id }}">
+    <i class="fas fa-chart-bar"></i>
+</button>
+
                         <button class="btn btn-primary openCalendar" data-worker-id="{{ $worker->id }}"><i class="fa fa-calendar"></i></button>
 
                             <button type="button" class="btn btn-sm btn-success editWorkerButton" data-worker-id="{{ $worker->id }}" data-worker-name="{{ $worker->name }}" data-worker-email="{{ $worker->email }}" data-worker-role="{{ $worker->role }}" data-worker-poste="{{ $worker->poste }}">Edit</button>
@@ -286,7 +289,111 @@
                         </td>
                     </tr>
                 @endforeach
+<!-- resources/views/modals/worker_stats.blade.php -->
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="modal fade" id="workerStatsModal" tabindex="-1" aria-labelledby="workerStatsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="workerStatsModalLabel">Worker Statistics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="statsContent"></div>
+                <canvas id="statsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $(document).on('click', '.openStatsModal', function() {
+        var workerId = $(this).data('worker-id');
+        $.ajax({
+    type: 'GET',
+    url: '/worker/stats/' + workerId,
+    success: function(data) {
+        var tableHtml = '<table class="table table-bordered">';
+        tableHtml += '<thead><tr><th>Project Name</th><th>Total Hours Worked</th></tr></thead>';
+        tableHtml += '<tbody>';
+
+        var projectNames = [];
+        var hoursWorked = [];
+
+        data.forEach(function(stat) {
+            tableHtml += '<tr><td>' + stat.project_name + '</td><td>' + stat.total_hours + '</td></tr>';
+            projectNames.push(stat.project_name);
+            hoursWorked.push(stat.total_hours);
+        });
+
+        tableHtml += '</tbody></table>';
+
+        $('#statsContent').html(tableHtml);
+
+        // Create a bar chart
+        var ctx = document.getElementById('statsChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: projectNames,
+                datasets: [{
+                    label: 'Hours Worked',
+                    data: hoursWorked,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Open the modal
+        $('#workerStatsModal').modal('show');
+    },
+    error: function(xhr) {
+        console.error('Error fetching worker stats:', xhr.responseText);
+    }
+});
+
+
+    });
+});
+
+
+
+</script>
                 <!-- Scripts -->
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
