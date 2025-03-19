@@ -21,7 +21,7 @@ class EventController extends Controller
             'end' => 'nullable|date|after:start',
             'description' => 'nullable|string'
         ]);
-    
+
         $event = Event::create([
             'title' => $request->title,
             'start' => $request->start,

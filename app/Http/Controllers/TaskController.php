@@ -13,12 +13,14 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
-        $tasks = Task::with('project')->get();
+
+
         $search = $request->input('search');
         $tasks = Task::when($search, function ($query, $search) {
             return $query->where('title', 'like', '%' . $search . '%')
                 ->orWhere('description', 'like', '%' . $search . '%');
-        })->get();
+        })->where('worker_id', auth()->id())->get();
+
 
         $projects = Project::all(); // Fetch all projects
 

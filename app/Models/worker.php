@@ -21,6 +21,14 @@ class Worker extends Authenticatable
         'password',
         'remember_token',
     ];
+
+
+    // Worker.php
+public function tasks()
+{
+    return $this->hasMany(Task::class, 'worker_id'); // or 'worker_name'
+}
+
     public function reports()
     {
         return $this->hasMany(Report::class);

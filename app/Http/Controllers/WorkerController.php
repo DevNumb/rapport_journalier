@@ -13,9 +13,29 @@ class WorkerController extends Controller
     // Display a listing of the workers
     public function index()
     {
-        $workers = Worker::all(); // Fetch all workers
-        return view('dashboard', compact('workers'));
+        $user = auth()->user();
+        $workers = Worker::all();
+        if ($user->role === 'admin') {
+            // Fetch data for admin dashboard
+            $data = [
+                // Add admin-specific data here
+                'workers' => Worker::all(),
+                // etc.
+            ];
+        } elseif ($user->role === 'worker') {
+            // Fetch data for worker dashboard
+            $data = [
+                // Add worker-specific data here
+                $tasks = Task::where('worker_id', $user->id)->get(),
+
+                // etc.
+            ];
+        }
+
+
+        return view('dashboard', compact('data','workers'));
     }
+
 
     // Show the form for creating a new worker
     public function create()

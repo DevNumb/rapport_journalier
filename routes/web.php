@@ -82,8 +82,32 @@ Route::get('/projects/{project}/user-statistics', [ProjectController::class, 'ge
 
 Route::get('/worker/stats/{worker_id}/{statsType?}', [WorkerController::class, 'getWorkerStats'])->name('worker.stats');
 
+// routes/web.php
+// routes/web.php
+// routes/web.php
 
+Route::group(['middleware' => ['auth']], function () {
+    Route::group(['middleware' => ['admin']], function () {
+        Route::get('/admin/dashboard', function () {
+            return view('admin.dashboard');
+        })->name('admin.dashboard');
 
+        // Admin-specific routes
+    });
+
+    Route::group(['middleware' => ['worker']], function () {
+        Route::get('/worker/tasks', function () {
+            return view('worker.tasks');
+        })->name('worker.tasks');
+
+        Route::get('/worker/calendar', function () {
+            return view('worker.calendar');
+        })->name('worker.calendar');
+    });
+
+    // Shared routes for both roles
+    Route::get('/dashboard', [WorkerController::class, 'index'])->name('dashboard');
+});
 
 
 

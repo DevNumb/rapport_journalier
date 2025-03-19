@@ -60,32 +60,42 @@
 
         <!-- Navbar Links -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('workers.index') ? 'active' : '' }}" href="{{ route('workers.index') }}">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('calendar.index') }}">Calendar</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('activities.index') }}">Manage Activities</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('tasks.index') ? 'active' : '' }}" href="{{ route('tasks.index') }}">Manage Tasks</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}" href="{{ route('reports.index') }}">Manage Reports</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('projects.index') ? 'active' : '' }}" href="{{ route('projects.index') }}">Manage Projects</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('journaliers.index') ? 'active' : '' }}" href="{{ route('journaliers.index') }}">Journalier Entries</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('activity-logs.index') }}">Activity Logs</a>
-                </li>
-            </ul>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    @if(auth()->user()->role === 'admin')
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('workers.index') ? 'active' : '' }}" href="{{ route('workers.index') }}">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}" href="{{ route('calendar.index') }}">Calendar</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('activities.index') ? 'active' : '' }}" href="{{ route('activities.index') }}">Manage Activities</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('tasks.index') ? 'active' : '' }}" href="{{ route('tasks.index') }}">Manage Tasks</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}" href="{{ route('reports.index') }}">Manage Reports</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('projects.index') ? 'active' : '' }}" href="{{ route('projects.index') }}">Manage Projects</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('journaliers.index') ? 'active' : '' }}" href="{{ route('journaliers.index') }}">Journalier Entries</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('activity-logs.index') ? 'active' : '' }}" href="{{ route('activity-logs.index') }}">Activity Logs</a>
+        </li>
+    @elseif(auth()->user()->role === 'worker')
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}" href="{{ route('calendar.index') }}">Calendar</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('tasks.index') ? 'active' : '' }}" href="{{ route('tasks.index') }}">Manage Tasks</a>
+        </li>
+    @endif
+</ul>
+
 
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
@@ -128,9 +138,11 @@
     <div class="container-fluid">
         <!-- Page Heading -->
         <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+        @if(auth()->user()->role === 'admin')
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
     Add New User
 </button>
+@endif
 <br> <br>
         <!-- Workers Table -->
         <div class="table-responsive">
@@ -262,6 +274,7 @@
                     <th>Role</th>
                     <th>Poste</th>
                     <th>Actions</th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -273,6 +286,7 @@
                         <td>{{ $worker->role }}</td>
                         <td>{{ $worker->poste }}</td>
                         <td>
+                @if(auth()->user()->role === 'admin')
                         <button class="btn btn-success openStatsModal" data-worker-id="{{ $worker->id }}">
     <i class="fas fa-chart-bar"></i>
 </button>
@@ -285,6 +299,7 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                             </form>
+                @endif
                         </td>
                     </tr>
                 @endforeach
