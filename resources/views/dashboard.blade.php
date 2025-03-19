@@ -39,6 +39,12 @@
     position: fixed; /* Ensure it stays in place */
 }
 
+.custom-title {
+    font-size: 28px; /* Adjust font size */
+    font-weight: bold;
+    text-align: center;/* Make the text bold */
+}
+
 /* Optional: Ensure the modal backdrop appears on top */
 
     </style>
@@ -136,8 +142,8 @@
 
 <div class="main-content">
     <div class="container-fluid">
-        <!-- Page Heading -->
-        <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+        <!-- Page Heading --><br><br>
+        <h1 class="h3 mb-4 text-gray-800 custom-title">Dashboard</h1><br>
         @if(auth()->user()->role === 'admin')
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
     Add New User
