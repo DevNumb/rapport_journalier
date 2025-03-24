@@ -14,24 +14,87 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
     <style>
         /* Your custom CSS here */
     </style>
-    
+
 </head>
 <body>
 
     <div class="container">
         <h1>Manage Tasks</h1>
 
+        <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createTaskModalLabel">Create New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createTaskForm" action="{{ route('tasks.store') }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" name="title" id="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea name="description" id="description" class="form-control" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select name="status" id="status" class="form-control" required>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="project" class="form-label">Project</label>
+                        <select name="project" id="project" class="form-control">
+                            <option value="">Select a Project</option>
+                            @foreach($projects as $project)
+                                <option value="{{ $project->id }}">{{ $project->nom_projet }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="duree_debut" class="form-label">Start Time</label>
+                        <input type="time"
+                               name="duree_debut"
+                               id="duree_debut"
+                               class="form-control"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="duree_fin" class="form-label">End Time</label>
+                        <input type="time"
+                               name="duree_fin"
+                               id="duree_fin"
+                               class="form-control"
+                               required>
+                    </div>
+                    <input type="hidden" name="worker_id" value="{{ Auth::id() }}">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-   
+
+
+
+
 
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal">
             Create New Task
-        </button>     
+        </button>
          <a href="{{ route('tasks.export') }}" class="btn btn-success">
     Export to Excel
 </a>
@@ -50,55 +113,6 @@
             </div>
         </div>
 </div>
-   <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createTaskModalLabel">Create New Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            <form id="createTaskForm" action="{{ route('tasks.store') }}" method="POST">
-    @csrf
-    <div class="mb-3">
-        <label for="title" class="form-label">Title</label>
-        <input type="text" name="title" id="title" class="form-control" required>
-    </div>
-    <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea name="description" id="description" class="form-control" required></textarea>
-    </div>
-    <div class="mb-3">
-        <label for="status" class="form-label">Status</label>
-        <select name="status" id="status" class="form-control" required>
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-        </select>
-    </div>
-    <div class="mb-3">
-        <label for="project" class="form-label">Project</label>
-        <select name="project" id="project" class="form-control">
-            <option value="">Select a Project</option>
-            @foreach($projects as $project)
-                <option value="{{ $project->id }}">{{ $project->nom_projet }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="mb-3">
-        <label for="hours" class="form-label">Hours</label>
-        <input type="number" step="any" name="hours" id="hours" class="form-control" required>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save</button>
-    </div>
-</form>
-
-            </div>
-        </div>
-    </div>
-</div>
-
 
  <!-- resources/views/tasks/index.blade.php -->
 
@@ -191,8 +205,8 @@
     });
 </script>
 
-       
-  
+
+
 
 <table class="table table-bordered">
     <thead>
@@ -206,7 +220,8 @@
         </tr>
     </thead>
     <tbody>
-    
+
+
         @foreach ($tasks as $task)
             <tr>
                 <td>{{ $task->id }}</td>
@@ -214,7 +229,7 @@
                 <td>{{ $task->description }}</td>
                 <td>{{ $task->status }}</td>
                 <td>{{ $task->system_date->format('Y-m-d H:i:s') }}</td> <!-- Display system_date -->
-                
+
                 <td>
                 @php
         $taskDate = \Carbon\Carbon::parse($task->system_date);
@@ -244,11 +259,11 @@
 </table>
 
 
-  
+
 
     </div>
 
-  
+
 </body>
 </html>
 @endsection

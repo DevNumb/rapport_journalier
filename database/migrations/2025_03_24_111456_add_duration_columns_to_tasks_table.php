@@ -6,19 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->unsignedBigInteger('worker_id')->nullable();
-            $table->foreign('worker_id')->references('id')->on('workers')->onDelete('cascade');
+
+
+            // Add hours column AFTER duree_fin
+            $table->float('hours', 8, 2)->nullable()->after('duree_fin');
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->dropForeign(['worker_id']);
-            $table->dropColumn('worker_id');
+            $table->dropColumn('hours');
         });
     }
 };

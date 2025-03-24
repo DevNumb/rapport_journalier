@@ -8,7 +8,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
-
+use Carbon\Carbon;
 class TaskController extends Controller
 {
     public function index(Request $request)
@@ -16,10 +16,17 @@ class TaskController extends Controller
 
 
         $search = $request->input('search');
-        $tasks = Task::when($search, function ($query, $search) {
-            return $query->where('title', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%');
-        })->where('worker_id', auth()->id())->get();
+        if (auth()->user()->role === 'admin') {
+            $tasks = Task::when($search, function ($query, $search) {
+                return $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
+            })->get();
+        } else {
+            $tasks = Task::when($search, function ($query, $search) {
+                return $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
+            })->where('worker_id', auth()->id())->get();
+        }
 
 
         $projects = Project::all(); // Fetch all projects
@@ -33,33 +40,41 @@ class TaskController extends Controller
     {
         return view('tasks.create');
     }
-
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'title' => 'required|string',
+            'title' => 'nullable|string',
             'description' => 'required|string',
+            'duree_debut' => 'required|date_format:H:i',
+            'duree_fin' => 'required|date_format:H:i|after:duree_debut',
             'status' => 'required|string',
-            'project' => 'nullable|exists:projects,id',
-            'hours' => 'nullable|numeric',
-             // Ensure project ID exists in the projects table
+            'project' => 'required|exists:projects,id',
+            'worker_id' => 'required|exists:workers,id',
+            'system_date' => 'nullable|date'
         ]);
 
+        // Calculate duration in hours/minutes
+        $start = Carbon::parse($validatedData['duree_debut']);
+        $end = Carbon::parse($validatedData['duree_fin']);
+        $duration = $end->diff($start);
+        $hours = $duration->h + ($duration->i / 60);
 
-        // Manually map the project field to project_id
-        $task = new Task();
-        $task->title = $validatedData['title'];
-        $task->description = $validatedData['description'];
-        $task->status = $validatedData['status'];
-        $task->project_id = $validatedData['project'];
-        $task->worker_id = Auth::id();
-        $task->hours = $validatedData['hours'];
-        $task->system_date = now();
-        // Assign project ID here
-        $task->save();
+        // Create task with calculated hours
+        Task::create([
+            'title' => $validatedData['title'],
+            'description' => $validatedData['description'],
+            'status' => $validatedData['status'],
+            'duree_debut' => $validatedData['duree_debut'],
+            'duree_fin' => $validatedData['duree_fin'],
+            'hours' => round($hours, 2),
+            'project_id' => $validatedData['project'],
+            'worker_id' => $validatedData['worker_id'],
+            'system_date' => $validatedData['system_date'] ?? now()
+        ]);
 
         return redirect()->route('tasks.index')->with('success', 'Task added successfully.');
     }
+
 
 
     public function update(Request $request, Task $task)

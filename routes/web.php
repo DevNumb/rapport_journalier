@@ -109,6 +109,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/dashboard', [WorkerController::class, 'index'])->name('dashboard');
 });
 
+Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
 
 
 require __DIR__.'/auth.php';

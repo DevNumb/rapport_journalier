@@ -12,10 +12,18 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->timestamp('system_date')->useCurrent()->useCurrentOnUpdate();
+            if (!Schema::hasColumn('tasks', 'worker_id')) {
+                $table->foreignId('worker_id');
+            }
+            if (!Schema::hasColumn('tasks', 'project_id')) {
+                $table->foreignId('project_id');
+            }
+
+            $table->foreign('worker_id')->references('id')->on('workers')->onDelete('cascade');
+            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
         });
     }
 
@@ -24,10 +32,13 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->dropColumn('system_date');
+            $table->dropForeign(['worker_id']);
+            $table->dropForeign(['project_id']);
+            $table->dropColumn('worker_id');
+            $table->dropColumn('project_id');
         });
     }
 };
