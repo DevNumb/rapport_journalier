@@ -20,12 +20,16 @@
 #calendarPopup {
     width: 100%;
     max-width: 800px;
+    overflow: hidden; /* Prevent content from spilling out */
 }
 
 #calendar {
     width: 100%;
     height: auto;
+    max-height: 500px; /* Optional: Add scroll if content grows */
+    overflow-y: auto;
 }
+
 
 .fc-event-title {
     white-space: normal !important; /* Allow text to wrap */
