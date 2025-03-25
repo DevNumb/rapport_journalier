@@ -74,49 +74,85 @@
 <script>
 
 </script>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Ref</th>
-                <th>Nom Projet</th>
-                <th>Description</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($projects as $project)
-                <tr>
-                    <td>{{ $project->ref }}</td>
-                    <td>{{ $project->nom_projet }}</td>
-                    <td>{{ $project->description }}</td>
-                    <td>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Liste des Projets</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Ref</th>
+                                <th>Nom Projet</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($projects as $project)
+                                <tr>
+                                    <td>{{ $project->ref }}</td>
+                                    <td>{{ $project->nom_projet }}</td>
+                                    <td>{{ $project->description }}</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a href="{{ route('projects.show', $project) }}" class="btn btn-info btn-sm me-1">View</a>
+                                            <a href="{{ route('projects.edit', $project) }}" class="btn btn-primary btn-sm me-1">Edit</a>
+                                            <form action="{{ route('projects.destroy', $project) }}" method="POST" style="display: inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm me-1">Delete</button>
+                                            </form>
+                                             <button
+                                                type="button"
+                                                class="btn btn-success btn-sm open-statistics-modal"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#statisticsModal1"
+                                                data-project-id="{{ $project->id }}"
+                                                data-project-name="{{ $project->nom_projet }}">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
 
-                        <a href="{{ route('projects.show', $project) }}" class="btn btn-info">View</a>
-                        <a href="{{ route('projects.edit', $project) }}" class="btn btn-primary">Edit</a>
+                    <!-- Pagination -->
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted">
+                            Showing {{ $projects->firstItem() }} to {{ $projects->lastItem() }} of {{ $projects->total() }} results
+                        </div>
+                        <nav aria-label="Projects pagination">
+                            <ul class="pagination pagination-sm justify-content-end">
+                                <li class="page-item {{ $projects->onFirstPage() ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ $projects->previousPageUrl() }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                @foreach ($projects->getUrlRange(max($projects->currentPage() - 2, 1), min($projects->currentPage() + 2, $projects->lastPage())) as $page => $url)
+                                    <li class="page-item {{ $projects->currentPage() == $page ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                    </li>
+                                @endforeach
+                                <li class="page-item {{ $projects->hasMorePages() ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ $projects->nextPageUrl() }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-
-    <form action="{{ route('projects.destroy', $project) }}" method="POST" style="display: inline;">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-danger ">Delete</button>
-    </form>
-   <!-- Statistics Button -->
-   <button
-        type="button"
-        class="btn btn-success  open-statistics-modal"
-        data-bs-toggle="modal"
-        data-bs-target="#statisticsModal1"
-        data-project-id="{{ $project->id }}"
-        data-project-name="{{ $project->nom_projet }}">
-    <i class="fas fa-chart-bar"></i>
-</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
  <!-- Modal -->
 
 

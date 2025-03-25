@@ -20,13 +20,15 @@ class TaskController extends Controller
             $tasks = Task::when($search, function ($query, $search) {
                 return $query->where('title', 'like', '%' . $search . '%')
                     ->orWhere('description', 'like', '%' . $search . '%');
-            })->get();
+            })->paginate(10); // Pagination pour admin
         } else {
             $tasks = Task::when($search, function ($query, $search) {
                 return $query->where('title', 'like', '%' . $search . '%')
                     ->orWhere('description', 'like', '%' . $search . '%');
-            })->where('worker_id', auth()->id())->get();
+            })->where('worker_id', auth()->id())
+              ->paginate(10); // Pagination pour utilisateur
         }
+
 
 
         $projects = Project::all(); // Fetch all projects

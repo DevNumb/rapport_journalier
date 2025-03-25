@@ -37,20 +37,7 @@
                 <form id="createTaskForm" action="{{ route('tasks.store') }}" method="POST">
                     @csrf
                     <div class="mb-3">
-                        <label for="title" class="form-label">Title</label>
-                        <input type="text" name="title" id="title" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea name="description" id="description" class="form-control" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
-                        <select name="status" id="status" class="form-control" required>
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
+
                     <div class="mb-3">
                         <label for="project" class="form-label">Project</label>
                         <select name="project" id="project" class="form-control">
@@ -60,6 +47,21 @@
                             @endforeach
                         </select>
                     </div>
+                        <label for="title" class="form-label">Titre de tache </label>
+                        <input type="text" name="title" id="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description de tache </label>
+                        <textarea name="description" id="description" class="form-control" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select name="status" id="status" class="form-control" required>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+
                     <div class="mb-3">
                         <label for="duree_debut" class="form-label">Start Time</label>
                         <input type="time"
@@ -130,14 +132,22 @@
                     @method('PUT')
                     <input type="hidden" id="editTaskId" name="task_id">
                     <input type="hidden" name="worker_id" value="{{ Auth::id() }}">
-
                     <div class="mb-3">
-                        <label for="editTitle" class="form-label">Title</label>
+                        <label for="editProject" class="form-label">Project</label>
+                        <select name="project" id="editProject" class="form-control" required>
+                            <option value="">Select a Project</option>
+                            @foreach($projects as $project)
+                                <option value="{{ $project->id }}">{{ $project->nom_projet }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTitle" class="form-label">titre de tache</label>
                         <input type="text" name="title" id="editTitle" class="form-control">
                     </div>
 
                     <div class="mb-3">
-                        <label for="editDescription" class="form-label">Description</label>
+                        <label for="editDescription" class="form-label">Description de tache</label>
                         <textarea name="description" id="editDescription" class="form-control" required></textarea>
                     </div>
 
@@ -149,15 +159,7 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="editProject" class="form-label">Project</label>
-                        <select name="project" id="editProject" class="form-control" required>
-                            <option value="">Select a Project</option>
-                            @foreach($projects as $project)
-                                <option value="{{ $project->id }}">{{ $project->nom_projet }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+
 
                     <div class="mb-3">
                         <label for="editDureeDebut" class="form-label">Start Time</label>
@@ -218,56 +220,99 @@
 
 
 
+<!-- Blade Template -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Liste des tâches</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($tasks as $task)
+                                <tr>
+                                    <td>{{ $task->id }}</td>
+                                    <td>{{ $task->title }}</td>
+                                    <td>{{ $task->description }}</td>
+                                    <td>{{ $task->status }}</td>
+                                    <td>{{ $task->system_date->format('Y-m-d H:i:s') }}</td>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th>Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
+                                    <td>
+                                        @php
+                                            $taskDate = \Carbon\Carbon::parse($task->system_date);
+                                            $isEditable = $taskDate->isToday();
+                                        @endphp
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-primary editTaskButton"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editTaskModal"
+                                                data-task-id="{{ $task->id }}"
+                                                data-task-title="{{ $task->title }}"
+                                                data-task-description="{{ $task->description }}"
+                                                data-task-status="{{ $task->status }}"
+                                                data-task-project="{{ $task->project_id }}"
+                                                data-task-hours="{{ $task->hours }}"
+                                                {{ $isEditable ? '' : 'disabled' }}>
+                                            Modifier
+                                        </button>
+
+                                        <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination with Information-->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted">
+                            Showing {{ $tasks->firstItem() }} to {{ $tasks->lastItem() }} of {{ $tasks->total() }} results
+                        </div>
+                        <nav aria-label="Task pagination">
+                            <ul class="pagination pagination-sm justify-content-end">  <!-- Use pagination-sm -->
+                                <li class="page-item {{ $tasks->onFirstPage() ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ $tasks->previousPageUrl() }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                @foreach ($tasks->getUrlRange(max($tasks->currentPage() - 2, 1), min($tasks->currentPage() + 2, $tasks->lastPage())) as $page => $url)
+                                    <li class="page-item {{ $tasks->currentPage() == $page ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                    </li>
+                                @endforeach
+                                <li class="page-item {{ $tasks->hasMorePages() ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ $tasks->nextPageUrl() }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-        @foreach ($tasks as $task)
-            <tr>
-                <td>{{ $task->id }}</td>
-                <td>{{ $task->title }}</td>
-                <td>{{ $task->description }}</td>
-                <td>{{ $task->status }}</td>
-                <td>{{ $task->system_date->format('Y-m-d H:i:s') }}</td> <!-- Display system_date -->
 
-                <td>
-                @php
-        $taskDate = \Carbon\Carbon::parse($task->system_date);
-        $isEditable = $taskDate->isToday();
-    @endphp
-                    <button     type="button"
-        class="btn btn-sm btn-primary editTaskButton"
-        data-bs-toggle="modal"
-        data-bs-target="#editTaskModal"
-        data-task-id="{{ $task->id }}"
-        data-task-title="{{ $task->title }}"
-        data-task-description="{{ $task->description }}"
-        data-task-status="{{ $task->status }}"
-        data-task-project="{{ $task->project_id }}"
-        data-task-hours="{{ $task->hours }}"
-        {{ $isEditable ? '' : 'disabled' }}>
-        Edit</button>
-                    <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-    </tbody>
-</table>
 
 
 

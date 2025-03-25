@@ -57,7 +57,8 @@ class ProjectController extends Controller
             return $query->where('ref', 'like', '%' . $search . '%')
                 ->orWhere('nom_projet', 'like', '%' . $search . '%')
                 ->orWhere('description', 'like', '%' . $search . '%');
-        })->get();
+        })->paginate(10); //10 items per page
+
 
         return view('projects.index', compact('projects', 'tasksByMonth', 'tasksByDay', 'tasksByYear'));
     }
