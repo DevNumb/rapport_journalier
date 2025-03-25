@@ -110,6 +110,6 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-
+Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
 
 require __DIR__.'/auth.php';

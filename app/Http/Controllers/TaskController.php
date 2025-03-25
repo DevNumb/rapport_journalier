@@ -80,23 +80,32 @@ class TaskController extends Controller
     public function update(Request $request, Task $task)
     {
         $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'nullable|string',
             'description' => 'required|string',
-            'status' => 'required|in:pending,completed',
-            'project' => 'nullable|exists:projects,id',
-            'hours' => 'nullable|numeric',
+            'duree_debut' => 'required|date_format:H:i',
+            'duree_fin' => 'required|date_format:H:i|after:duree_debut',
+            'status' => 'required|string',
+            'project' => 'required|exists:projects,id',
+            'system_date' => 'nullable|date'
         ]);
 
-        // Update task with validated data
+        // Calculate duration
+        $start = Carbon::createFromFormat('H:i', $validatedData['duree_debut']);
+        $end = Carbon::createFromFormat('H:i', $validatedData['duree_fin']);
+        $hours = $end->diffInMinutes($start) / 60;
+
         $task->update([
             'title' => $validatedData['title'],
             'description' => $validatedData['description'],
             'status' => $validatedData['status'],
+            'duree_debut' => $validatedData['duree_debut'],
+            'duree_fin' => $validatedData['duree_fin'],
+            'hours' => round($hours, 2),
             'project_id' => $validatedData['project'],
-            'hours' => $validatedData['hours'],
+            'system_date' => $validatedData['system_date'] ?? $task->system_date
         ]);
 
-        return redirect()->route('tasks.index')->with('success', 'Task added successfully.');
+        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
 

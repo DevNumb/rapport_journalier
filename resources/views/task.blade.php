@@ -129,10 +129,11 @@
                     @csrf
                     @method('PUT')
                     <input type="hidden" id="editTaskId" name="task_id">
+                    <input type="hidden" name="worker_id" value="{{ Auth::id() }}">
 
                     <div class="mb-3">
                         <label for="editTitle" class="form-label">Title</label>
-                        <input type="text" name="title" id="editTitle" class="form-control" required>
+                        <input type="text" name="title" id="editTitle" class="form-control">
                     </div>
 
                     <div class="mb-3">
@@ -150,7 +151,7 @@
 
                     <div class="mb-3">
                         <label for="editProject" class="form-label">Project</label>
-                        <select name="project" id="editProject" class="form-control">
+                        <select name="project" id="editProject" class="form-control" required>
                             <option value="">Select a Project</option>
                             @foreach($projects as $project)
                                 <option value="{{ $project->id }}">{{ $project->nom_projet }}</option>
@@ -159,8 +160,18 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="editHours" class="form-label">Hours</label>
-                        <input type="number" step="any" name="hours" id="editHours" class="form-control" required>
+                        <label for="editDureeDebut" class="form-label">Start Time</label>
+                        <input type="time" name="duree_debut" id="editDureeDebut" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editDureeFin" class="form-label">End Time</label>
+                        <input type="time" name="duree_fin" id="editDureeFin" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editSystemDate" class="form-label">System Date</label>
+                        <input type="date" name="system_date" id="editSystemDate" class="form-control">
                     </div>
 
                     <div class="modal-footer">
