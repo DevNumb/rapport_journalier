@@ -1,6 +1,9 @@
 
 @extends('layouts.app')
 
+@section('title', 'les activities')
+
+
 @section('content')
 
     <h1>Activities</h1>

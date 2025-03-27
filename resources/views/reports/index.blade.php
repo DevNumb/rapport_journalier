@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Mon rapport')
+
 @section('content')
     <div class="container">
         <h1>Reports Index</h1>

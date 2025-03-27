@@ -3,7 +3,7 @@
 @php
 use Carbon\Carbon;
 @endphp
-
+@section('title', 'Admin dashboard')
 @section('content')
 
 

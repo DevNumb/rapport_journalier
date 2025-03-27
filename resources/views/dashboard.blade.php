@@ -568,7 +568,6 @@ const $calendarPopup = $('#calendarPopup');
     });
 </script>
 
-</body>
 
                 </tbody>
             </table>
@@ -581,5 +580,19 @@ const $calendarPopup = $('#calendarPopup');
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<footer class="text-center mt-5 py-4" style="background: linear-gradient(45deg, #343a40, #495057); color: #f8f9fa; font-family: 'Inter', sans-serif;">
+    <p style="margin: 0; font-size: 1.2rem;">&copy; All rights reserved 2025  GEREP Environnement</p>
+    <div style="margin-top: 10px;">
+        <a href="#" style="color: #f8f9fa; margin: 0 10px; text-decoration: none;">Privacy Policy</a>
+        <a href="#" style="color: #f8f9fa; margin: 0 10px; text-decoration: none;">Terms of Service</a>
+        <a href="#" style="color: #f8f9fa; margin: 0 10px; text-decoration: none;">Contact Us</a>
+    </div>
+    <div style="margin-top: 15px;">
+        <a href="#" style="color: #f8f9fa; margin: 0 5px;"><i class="fab fa-facebook"></i></a>
+        <a href="#" style="color: #f8f9fa; margin: 0 5px;"><i class="fab fa-twitter"></i></a>
+        <a href="#" style="color: #f8f9fa; margin: 0 5px;"><i class="fab fa-instagram"></i></a>
+    </div>
+</footer>
+
 </body>
 </html>

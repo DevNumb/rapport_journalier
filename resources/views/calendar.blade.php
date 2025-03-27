@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Calendar')
+
 @section('content')
 
 
@@ -238,7 +240,10 @@
             calendar.render();
         });
     </script>
+ 
+
 </body>
+        
 </html>
 @endsection
 
