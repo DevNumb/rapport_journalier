@@ -40,12 +40,12 @@
 
                     <div class="mb-3">
                         <label for="project" class="form-label">Project</label>
-                        <select name="project" id="project" class="form-control">
-                            <option value="">Select a Project</option>
-                            @foreach($projects as $project)
-                                <option value="{{ $project->id }}">{{ $project->nom_projet }}</option>
-                            @endforeach
-                        </select>
+                        <select name="project" id="editProject" class="form-control" required>
+                        <option value="">Select a Project</option>
+                         @foreach($projects->sortBy('nom_projet') as $project)
+                        <option value="{{ $project->id }}">{{ $project->ref }}</option>
+    @endforeach
+</select>
                     </div>
                         <label for="title" class="form-label">Titre de tache </label>
                         <input type="text" name="title" id="title" class="form-control" required>
@@ -135,11 +135,12 @@
                     <div class="mb-3">
                         <label for="editProject" class="form-label">Project</label>
                         <select name="project" id="editProject" class="form-control" required>
-                            <option value="">Select a Project</option>
-                            @foreach($projects as $project)
-                                <option value="{{ $project->id }}">{{ $project->nom_projet }}</option>
-                            @endforeach
-                        </select>
+                        <option value="">Select a Project</option>
+                         @foreach($projects->sortBy('nom_projet') as $project)
+                        <option value="{{ $project->id }}">{{ $project->nom_projet }}</option>
+    @endforeach
+</select>
+
                     </div>
                     <div class="mb-3">
                         <label for="editTitle" class="form-label">titre de tache</label>

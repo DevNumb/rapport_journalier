@@ -93,9 +93,7 @@
         <li class="nav-item">
             <a class="nav-link {{ request()->routeIs('journaliers.index') ? 'active' : '' }}" href="{{ route('journaliers.index') }}">Journalier Entries</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('activity-logs.index') ? 'active' : '' }}" href="{{ route('activity-logs.index') }}">Activity Logs</a>
-        </li>
+     
     @elseif(auth()->user()->role === 'worker')
         <li class="nav-item">
             <a class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}" href="{{ route('calendar.index') }}">Calendar</a>
